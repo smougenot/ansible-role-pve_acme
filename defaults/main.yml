@@ -1,5 +1,5 @@
 ---
-pve_acme_domain: ""
+pve_acme_domains: []
 
 pve_acme_account_name: default
 pve_acme_account_email: ""

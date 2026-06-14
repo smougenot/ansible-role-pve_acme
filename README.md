@@ -19,7 +19,7 @@ Role Variables
 
 Available variables are listed below, along with default values (see `defaults/main.yml`):
 
-    pve_acme_domain: ""
+    pve_acme_domains: []
 
     pve_acme_account_name: default
     pve_acme_account_email: ""
@@ -31,7 +31,7 @@ Available variables are listed below, along with default values (see `defaults/m
     pve_acme_plugin_api: ""
     pve_acme_plugin_data: ""
 
-The `pve_acme_domain` variable value should be the node fqdn (ex: `pve.example.com`). The next three variables allow configuration of the Acme account used to request certificates. The `pve_acme_account_name` should be left to default if possible since this is the account which will be used to order certifcates by default.`pve_acme_account_email` value should be the email which will receive letsencrypt notifications. The last key, `pve_acme_account_directory`, should be either `https://acme-v02.api.letsencrypt.org/directory` (for production certificates) or `https://acme-staging-v02.api.letsencrypt.org/directory` (for staging certificates).
+The `pve_acme_domains` variable is a list of FQDNs to configure as ACME domains on the node (e.g. `["pve.example.com"]`). Multiple domains are mapped to `acmedomain0`, `acmedomain1`, etc. in the Proxmox config. The next three variables allow configuration of the Acme account used to request certificates. The `pve_acme_account_name` should be left to default if possible since this is the account which will be used to order certifcates by default.`pve_acme_account_email` value should be the email which will receive letsencrypt notifications. The last key, `pve_acme_account_directory`, should be either `https://acme-v02.api.letsencrypt.org/directory` (for production certificates) or `https://acme-staging-v02.api.letsencrypt.org/directory` (for staging certificates).
 
 The `pve_acme_validation_delay` represents the extra delay in seconds to wait before requesting validation. It allows to cope with a long TTL of DNS records. 
 
@@ -48,7 +48,9 @@ Example Playbook
     - hosts: localhost
 
       vars:
-        pve_acme_domain: "pve.example.com"
+        pve_acme_domains:
+          - "pve.example.com"
+          - "pve-alt.example.com"
         pve_acme_account_email: "test@email.com"
         pve_acme_plugin_name: "cloudflare"
         pve_acme_plugin_api: "cf"

@@ -55,14 +55,20 @@
 
 - name: Check if ACME domain is already configured
   ansible.builtin.command:
-    cmd: "grep -Fxq 'acmedomain0: domain={{ pve_acme_domain }},plugin={{ pve_acme_plugin_name }}' /etc/pve/local/config"
-  register: acme_domain_list
+    cmd: "grep -q 'domain={{ item }}' /etc/pve/local/config"
+  loop: "{{ pve_acme_domains }}"
+  loop_control:
+    index_var: idx
+  register: acme_domain_check
   check_mode: false
   ignore_errors: true
   changed_when: false
 
 - name: Add ACME domain configuration
   ansible.builtin.command:
-    cmd: pvenode config set --acmedomain0 domain={{ pve_acme_domain }},plugin={{ pve_acme_plugin_name }}
-  when: acme_domain_list.rc != 0
+    cmd: pvenode config set --acmedomain{{ idx }} domain={{ item }},plugin={{ pve_acme_plugin_name }}
+  loop: "{{ pve_acme_domains }}"
+  loop_control:
+    index_var: idx
+  when: acme_domain_check.results[idx].rc != 0
   notify: Order ACME certificates
