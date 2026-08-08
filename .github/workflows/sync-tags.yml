@@ -2,22 +2,21 @@ name: Sync tags from upstream
 
 on:
   schedule:
-    # Exécute tous les jours à 03h00 UTC (ajuste si besoin)
     - cron: '0 3 * * *'
-  workflow_dispatch:  # Permet de lancer manuellement depuis l'onglet Actions
+  workflow_dispatch:
 
 jobs:
   sync-tags:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # Nécessaire pour pousser les tags
+      contents: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Important pour récupérer tous les tags
-          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+          token: ${{ secrets.UPSTREAM_SYNC_TOKEN }}
 
       - name: Configure git identity
         run: |
@@ -26,21 +25,15 @@ jobs:
 
       - name: Add upstream remote
         run: |
-          # Supprime upstream s'il existe déjà (cas de ré-exécution)
           git remote remove upstream 2>/dev/null || true
-          git remote add upstream https://github.com/simoncaron/ansible-role-pve_acme.git
+          git remote add upstream https://github.com/evrard/ansible-role-pve_acme.git
 
-      - name: Fetch tags from upstream
+      - name: Fetch tags and commits from upstream
         run: |
           git fetch upstream --tags --force
 
-      - name: List new tags (optional, pour debug)
-        run: |
-          echo "=== Tags locaux avant sync ==="
-          git tag --list | sort
-          echo "=== Tags upstream ==="
-          git tag --list --sort=-creatordate | head -20
-
-      - name: Push all tags to fork
+      - name: Push tags and associated commits to fork
         run: |
           git push origin --tags --force
+          # Optionnel : pousser aussi la branche main/master si tu veux synchroniser le code
+          # git push origin main --force
