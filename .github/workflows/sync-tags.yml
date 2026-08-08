@@ -1,0 +1,18 @@
+name: Sync tags from upstream
+
+on:
+  schedule:
+    # Exécute tous les jours à 03h00 UTC (ajuste si besoin)
+    - cron: '0 3 * * *'
+  workflow_dispatch:  # Permet de lancer manuellement depuis l'onglet Actions
+
+jobs:
+  sync-tags:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sync tags from upstream to fork
+        uses: chachako/tags-sync@v1
+        with:
+          base-repository: evrard/ansible-role-pve_acme
+          head-repository: smougenot/ansible-role-pve_acme
+          patch-author: smougenot
