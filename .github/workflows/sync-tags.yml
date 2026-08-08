@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Sync tags from upstream to fork
-        uses: chachako/tags-sync@v1
+        uses: chachako/tags-sync@8df8b1137e53c30b52414b37f4ed126c919c8905
         with:
           base-repository: evrard/ansible-role-pve_acme
           head-repository: smougenot/ansible-role-pve_acme
