@@ -9,10 +9,38 @@ on:
 jobs:
   sync-tags:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Nécessaire pour pousser les tags
+
     steps:
-      - name: Sync tags from upstream to fork
-        uses: chachako/tags-sync@8df8b1137e53c30b52414b37f4ed126c919c8905
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          base-repository: evrard/ansible-role-pve_acme
-          head-repository: smougenot/ansible-role-pve_acme
-          patch-author: smougenot
+          fetch-depth: 0  # Important pour récupérer tous les tags
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Add upstream remote
+        run: |
+          # Supprime upstream s'il existe déjà (cas de ré-exécution)
+          git remote remove upstream 2>/dev/null || true
+          git remote add upstream https://github.com/evrard/ansible-role-pve_acme.git
+
+      - name: Fetch tags from upstream
+        run: |
+          git fetch upstream --tags --force
+
+      - name: List new tags (optional, pour debug)
+        run: |
+          echo "=== Tags locaux avant sync ==="
+          git tag --list | sort
+          echo "=== Tags upstream ==="
+          git tag --list --sort=-creatordate | head -20
+
+      - name: Push all tags to fork
+        run: |
+          git push origin --tags --force
