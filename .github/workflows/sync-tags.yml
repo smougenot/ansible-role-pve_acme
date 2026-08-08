@@ -26,7 +26,7 @@ jobs:
       - name: Add upstream remote
         run: |
           git remote remove upstream 2>/dev/null || true
-          git remote add upstream https://github.com/evrard/ansible-role-pve_acme.git
+          git remote add upstream https://github.com/simoncaron/ansible-role-pve_acme.git
 
       - name: Fetch tags and commits from upstream
         run: |
